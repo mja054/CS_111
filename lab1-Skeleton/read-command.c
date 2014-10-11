@@ -17,32 +17,37 @@
 
 #include "command.h"
 #include "command-internals.h"
+#include "alloc.h"
 
 #include <error.h>
-
 /* FIXME: You may need to add #include directives, macro definitions,
    static function definitions, etc.  */
 
 /* FIXME: Define the type 'struct command_stream' here.  This should
    complete the incomplete type declaration in command.h.  */
 
-command_stream_t *
+command_stream_t
 AllocateCommandStream()
 {
-  command_stream_t *node = NULL;
+  command_stream_t node = NULL;
 
-  node = checked_malloc(sizeof cmd_stream_node);
-  node->command = node->node = NULL;
+  node = checked_malloc(sizeof(struct command_stream));
+  node->command = NULL;
+  node->next = NULL;
 
   return node;
 }
+
 
 int
 ReadNextToken(char **t, int (*get_next_byte) (void *),
 	      void *get_next_byte_argument)
 {
+  return 0;
+}
+  /*
   char c;
-  char *token = ;
+  char *token = checked_malloc(;
 
   if (!t) {
     return -1; // Replace with error code
@@ -62,19 +67,18 @@ ReadNextToken(char **t, int (*get_next_byte) (void *),
   }
   return ;
 }
-
+*/
 command_stream_t
 make_command_stream (int (*get_next_byte) (void *),
 		     void *get_next_byte_argument)
 {
-  command_stream_t *head = NULL;
-  command_stream_t *prev = NULL;
-  command_stream_t *cur  = NULL;
+  command_stream_t head = NULL;
+  command_stream_t prev = NULL;
+  command_stream_t cur  = NULL;
 
   while (1) {
-    command_stream_t *cmd_stream_node = NULL;
-    command_t command = make_command_stream_util(get_next_byte,
-						 get_next_byte_argument);
+    command_t command = NULL; //make_command_stream_util(get_next_byte,
+    //		 get_next_byte_argument);
     if (command) {
       cur = AllocateCommandStream();
       cur->command = command;
@@ -89,21 +93,24 @@ make_command_stream (int (*get_next_byte) (void *),
     }
   }
 
-  return cmd_stream_node;
+  return head;
 }
 
 command_t
-read_command_stream (command_stream_t **s)
+read_command_stream (command_stream_t *s)
 {
-  command_t *command;
+  command_t command;
+  command_stream_t cur  = NULL;
 
   if (!s || !*s) {
     return NULL;
   }
 
-  command = (*s)->command;
+  cur = *s;
 
-  *s = (*s)->next;
+  command = cur->command;
+
+  *s = cur->next;
 
   // Free *s
 
